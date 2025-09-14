@@ -53,7 +53,7 @@ jobs:
         args: --timeout=5m
         
     - name: Run gosec security scanner
-      uses: securecodewarrior/github-action-gosec@master
+      uses: securego/gosec@master
       with:
         args: './...'
 
