@@ -52,7 +52,7 @@ jobs:
           ./examples/performance
           
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: logmiao-${{ matrix.goos }}-${{ matrix.goarch }}
         path: dist/
@@ -66,7 +66,7 @@ jobs:
         fetch-depth: 0
         
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: dist/
         
