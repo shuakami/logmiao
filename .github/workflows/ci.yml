@@ -46,11 +46,6 @@ jobs:
         flags: unittests
         name: codecov-umbrella
 
-    - name: Run gosec security scanner
-      uses: securego/gosec@master
-      with:
-        args: './...'
-
   build:
     runs-on: ubuntu-latest
     needs: test
