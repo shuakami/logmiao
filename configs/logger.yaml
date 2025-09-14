@@ -1,0 +1,56 @@
+# Go Advanced Logger 配置文件
+# 这是一个完整的配置示例，展示了所有可用选项
+
+logger:
+  # 日志级别: debug, info, warn, error
+  level: "info"
+  
+  # 输出格式: color（彩色控制台）, json, text
+  format: "color"
+
+  # 输出配置
+  output:
+    # 控制台输出
+    console:
+      enabled: true
+      format: "color"  # color, json, text
+    
+    # 文件输出
+    file:
+      enabled: true
+      path: "logs/app.log"
+      format: "json"  # json, text (建议使用json便于后续分析)
+      
+      # 日志轮转配置
+      rotation:
+        max_size: 10        # 单个日志文件最大大小（MB）
+        max_backups: 5      # 保留的备份文件数量
+        max_age: 30         # 日志文件保留天数
+        compress: true      # 是否压缩旧日志文件
+
+  # 功能配置
+  features:
+    smart_filter: true           # 智能过滤（过滤框架噪音）
+    keyword_highlight: true      # 关键词高亮
+    auto_sampling: false         # 自动采样（高频日志降频）
+    performance_tracking: true   # 性能追踪
+    
+    # 隐私脱敏配置 - 默认全部关闭，需要时可在此开启
+    privacy:
+      enable_email_mask: false    # 启用邮箱脱敏
+      enable_phone_mask: false    # 启用手机号脱敏
+      enable_input_sanitize: false # 启用输入清理（防日志注入）
+
+  # 中间件配置
+  middleware:
+    log_body: true              # 是否记录请求体（仅在错误时）
+    log_headers: false          # 是否记录请求头
+    max_body_size: 2048         # 最大请求体记录大小（字节）
+
+  # Web日志查看器配置（可选）
+  viewer:
+    enabled: false              # 生产环境建议关闭
+    port: 8081
+    auth:
+      username: "admin"
+      password: "your-secret-password"

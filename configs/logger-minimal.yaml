@@ -1,0 +1,26 @@
+# Go Advanced Logger 最小配置示例
+# 适用于简单应用的快速配置
+
+logger:
+  level: "info"
+  format: "color"
+  
+  output:
+    console:
+      enabled: true
+    file:
+      enabled: true
+      path: "logs/app.log"
+
+  # 功能配置 - 最小配置全部关闭
+  features:
+    smart_filter: false
+    keyword_highlight: false
+    auto_sampling: false
+    performance_tracking: false
+    
+    # 隐私脱敏配置 - 最小配置默认关闭
+    privacy:
+      enable_email_mask: false
+      enable_phone_mask: false
+      enable_input_sanitize: false

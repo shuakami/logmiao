@@ -1,0 +1,40 @@
+# Go Advanced Logger 生产环境配置示例
+# 适用于生产环境的优化配置
+
+logger:
+  level: "warn"  # 生产环境只记录警告和错误
+  format: "json" # 生产环境使用JSON格式便于日志分析
+
+  output:
+    console:
+      enabled: true
+      format: "json"
+    file:
+      enabled: true
+      path: "/var/log/app/application.log"
+      format: "json"
+      rotation:
+        max_size: 50      # 生产环境使用更大的文件
+        max_backups: 10   # 保留更多备份
+        max_age: 90       # 保留更长时间
+        compress: true
+
+  features:
+    smart_filter: true
+    keyword_highlight: false     # 生产环境不需要高亮
+    auto_sampling: true          # 开启采样以减少日志量
+    performance_tracking: true
+    
+    # 隐私脱敏配置 - 生产环境建议开启
+    privacy:
+      enable_email_mask: true     # 生产环境启用邮箱脱敏
+      enable_phone_mask: true     # 生产环境启用手机号脱敏
+      enable_input_sanitize: true # 生产环境启用输入清理
+
+  middleware:
+    log_body: false              # 生产环境不记录请求体以保护隐私
+    log_headers: false           # 不记录请求头
+    max_body_size: 1024
+
+  viewer:
+    enabled: false               # 生产环境禁用Web查看器

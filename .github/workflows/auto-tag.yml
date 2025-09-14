@@ -1,0 +1,61 @@
+name: Auto Tag
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'version.go'
+
+permissions:
+  contents: write
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip-tag]')"
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+        
+    - name: Extract version from version.go
+      id: version
+      run: |
+        VERSION=$(grep 'Version = ' version.go | sed 's/.*Version = "\(.*\)"/\1/')
+        echo "version=v$VERSION" >> $GITHUB_OUTPUT
+        echo "raw_version=$VERSION" >> $GITHUB_OUTPUT
+        echo "检测到版本: $VERSION"
+        
+    - name: Check if tag exists
+      id: tag-check
+      run: |
+        if git rev-parse "refs/tags/${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "标签 ${{ steps.version.outputs.version }} 已存在"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "标签 ${{ steps.version.outputs.version }} 不存在，将创建"
+        fi
+        
+    - name: Create and push tag
+      if: steps.tag-check.outputs.exists == 'false'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # 创建标签
+        git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
+        git push origin ${{ steps.version.outputs.version }}
+        
+        echo "成功创建并推送标签: ${{ steps.version.outputs.version }}"
+        
+    - name: Skip tag creation
+      if: steps.tag-check.outputs.exists == 'true'
+      run: |
+        echo "跳过标签创建，标签已存在: ${{ steps.version.outputs.version }}"

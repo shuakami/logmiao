@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+        
+    - name: Run tests
+      run: |
+        go mod download
+        go test -v ./...
+        
+    - name: Run linter
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: windows
+            goarch: arm64
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+        
+    - name: Build binary
+      run: |
+        mkdir -p dist
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build \
+          -o dist/logmiao-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }} \
+          -ldflags="-X 'main.version=${{ github.ref_name }}'" \
+          ./examples/performance
+          
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: logmiao-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: dist/
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # 获取当前标签和上一个标签
+        CURRENT_TAG=${{ github.ref_name }}
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^)
+        
+        echo "## 更新日志 $CURRENT_TAG" > changelog.md
+        echo "" >> changelog.md
+        echo "**发布时间:** $(date +'%Y-%m-%d %H:%M:%S')" >> changelog.md
+        echo "" >> changelog.md
+        
+        if [ "$PREVIOUS_TAG" != "" ]; then
+          echo "### 变更内容" >> changelog.md
+          git log --pretty=format:"- %s (%an)" $PREVIOUS_TAG..$CURRENT_TAG >> changelog.md
+          echo "" >> changelog.md
+        fi
+        
+        echo "### 下载" >> changelog.md
+        echo "请从 Assets 部分下载适合你系统的二进制文件。" >> changelog.md
+        echo "" >> changelog.md
+        echo "### 使用方法" >> changelog.md
+        echo '```go' >> changelog.md
+        echo 'import "github.com/shuakami/logmiao"' >> changelog.md
+        echo '```' >> changelog.md
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: LogMiao ${{ github.ref_name }}
+        body_path: changelog.md
+        files: |
+          dist/**/*
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Publish Go Module
+      run: |
+        # Go modules 会自动通过 proxy.golang.org 获取
+        echo "Go模块将在几分钟后通过 proxy.golang.org 自动可用"
+        echo "用户可以通过以下命令安装:"
+        echo "   go get github.com/shuakami/logmiao@${{ github.ref_name }}"
