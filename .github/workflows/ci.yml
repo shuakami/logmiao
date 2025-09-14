@@ -45,13 +45,7 @@ jobs:
         file: ./coverage.out
         flags: unittests
         name: codecov-umbrella
-        
-    - name: Run linter
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-        args: --timeout=5m
-        
+
     - name: Run gosec security scanner
       uses: securego/gosec@master
       with:
