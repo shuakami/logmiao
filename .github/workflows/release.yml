@@ -75,7 +75,7 @@ jobs:
       run: |
         # 获取当前标签和上一个标签
         CURRENT_TAG=${{ github.ref_name }}
-        PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^)
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
         
         echo "## 更新日志 $CURRENT_TAG" > changelog.md
         echo "" >> changelog.md
@@ -85,6 +85,17 @@ jobs:
         if [ "$PREVIOUS_TAG" != "" ]; then
           echo "### 变更内容" >> changelog.md
           git log --pretty=format:"- %s (%an)" $PREVIOUS_TAG..$CURRENT_TAG >> changelog.md
+          echo "" >> changelog.md
+        else
+          echo "### 变更内容" >> changelog.md
+          echo "- 🎉 LogMiao Go日志库首次发布" >> changelog.md
+          echo "- ✨ 高性能结构化日志记录" >> changelog.md
+          echo "- 📝 支持多种输出格式 (JSON, Text)" >> changelog.md
+          echo "- 🎨 控制台彩色输出支持" >> changelog.md
+          echo "- 📁 文件轮转和归档功能" >> changelog.md
+          echo "- 🌐 Gin中间件集成" >> changelog.md
+          echo "- 🔍 智能过滤和处理" >> changelog.md
+          echo "- 📊 多级别日志支持" >> changelog.md
           echo "" >> changelog.md
         fi
         
