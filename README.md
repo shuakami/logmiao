@@ -6,8 +6,6 @@
 [![Release](https://img.shields.io/github/v/release/shuakami/logmiao?style=flat-square&color=667eea)](https://github.com/shuakami/logmiao/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go)](https://golang.org/)
-[![GitHub issues](https://img.shields.io/github/issues/shuakami/logmiao)](https://github.com/shuakami/logmiao/issues)
-[![GitHub stars](https://img.shields.io/github/stars/shuakami/logmiao)](https://github.com/shuakami/logmiao/stargazers)
 ![Platform](https://img.shields.io/badge/平台-Win/Mac/Linux-48bb78?style=flat-square)
 
 ## 这是什么
