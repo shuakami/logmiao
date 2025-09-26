@@ -2,7 +2,7 @@ package logger
 
 // Version 包版本信息
 const (
-	Version = "1.0.0"
+	Version = "1.0.1"
 	Name    = "LogMiao"
 	Author  = "shuakami"
 	License = "GPL-3.0"
