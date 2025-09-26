@@ -105,7 +105,7 @@ func LoadConfig(path string) (*Config, error) {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("警告: 配置文件未找到，使用默认配置")
+			// 配置文件未找到，使用默认配置（静默处理）
 		} else {
 			return nil, fmt.Errorf("读取配置文件失败: %w", err)
 		}
